@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdio_ext.h> //allow __fpurge - clears buffer
 #include "funcs.h"
 
-void menu();
+int menu();
 
 int main(int argc, char *argv[])
 {
@@ -13,7 +14,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-void menu()
+int menu()
 {
 	char menuChoice;
 
@@ -24,8 +25,10 @@ void menu()
 	printf("3 - Search movie by title or ID\n");
 	printf("4 - Check movie info\n");
 	printf("5 - Generate TXT report\n");
-	printf("6 - Generate PDF report \n\n");
+	printf("6 - Generate PDF report \n");
+	printf("7 - Exit\n\n");
 
+	__fpurge(stdin);
 	scanf("%c", &menuChoice);
 
 	switch(menuChoice)
@@ -54,11 +57,16 @@ void menu()
 			system("clear");
 			generatePDF();
 			break;
+		case '7':
+			printf("Exiting...\n");
+			return 0;
+			break;
 		default:
 			system("clear");
 			printf("Digit invalid! Insert a valid digit or press CTRL + C to exit...\n\n");
 			menu();
 			break;
 	}
-
+	menu();
+	return 0;
 }

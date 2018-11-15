@@ -1,4 +1,4 @@
-void registerMovie();
+int registerMovie();
 
 void editMovie();
 
