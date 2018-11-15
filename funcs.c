@@ -4,6 +4,11 @@
 #include <time.h> //
 #include<stdio_ext.h> //allow __fpurge - clears buffer
 
+void invalidDigit();
+void textGreen();
+void textRed();
+void resetText();
+
 int registerMovie()
 {
 	printf("====== REGISTER MOVIE ======\n\n");
@@ -29,20 +34,14 @@ int registerMovie()
 	int i = rand();
 	snprintf(newMovie.ID, 16, "%x", i);
 	printf("ID: %s", newMovie.ID);
-	//strtok(newMovie.ID, "\n");
 
 	//set movie status
 	strcpy(newMovie.isRent, "false"); //false because it is not rented while you are registering it
 	printf("\nStatus: %s", newMovie.isRent);
-	//strtok(newMovie.isRent, "\n");
 
 	//set movie tax by day
-	//char taxAsString[20];
-
 	printf("\nTax by day: ");
 	scanf("%f", &newMovie.tax);
-	/*sprintf(taxAsString, "%.2f", newMovie.tax);
-	strtok(taxAsString, "\n");*/
 
 	char isInfoRight; 
 
@@ -57,7 +56,7 @@ int registerMovie()
 		}
 		else if(isInfoRight == 'n' || isInfoRight == 'N')
 		{
-			printf("\nPress Enter to go back to menu or press CTRL + C to stop the software...\n");
+			printf("\nPress Enter to go back to menu or press CTRL + C to abort...\n");
 			__fpurge(stdin);
 			getchar();
 			system("clear");
@@ -65,7 +64,7 @@ int registerMovie()
 		}
 		else
 		{
-			printf("\nDigit invalid! Insert a valid digit or press CTRL + C to exit...");
+			invalidDigit();
 		}
 
 	}while(isInfoRight != 'y' && isInfoRight != 'Y' && isInfoRight != 'n' && isInfoRight != 'N');
@@ -75,13 +74,17 @@ int registerMovie()
 	fprintf(myFile, "%s|%s|%s|%.2f;", newMovie.ID, newMovie.title, newMovie.isRent, newMovie.tax); //save movie info
 	fclose(myFile);
 
+	textGreen();
+	printf("\nMovie registered successfully!!\n");
+	resetText();
+
 	char userChoice;
 
-	printf("\nMovie registered successfully!!\nWanna register a new movie? Y/N\n");
-	__fpurge(stdin);
-	scanf("%c", &userChoice);
-
 	do{
+		printf("\nWanna register a new movie? Y/N\n");
+		__fpurge(stdin);
+		scanf("%c", &userChoice);
+
 		if(userChoice == 'y' || userChoice == 'Y')
 		{	
 			system("clear");
@@ -89,7 +92,7 @@ int registerMovie()
 		}
 		else if(userChoice == 'n' || userChoice == 'N')
 		{
-			printf("\nPress Enter to go back to menu or press CTRL + C to stop the software...\n");
+			printf("\nPress Enter to go back to menu or press CTRL + C to abort...\n");
 			__fpurge(stdin);
 			getchar();
 			system("clear");
@@ -97,7 +100,7 @@ int registerMovie()
 		}
 		else
 		{
-			printf("\nDigit invalid! Insert a valid digit or press CTRL + C to exit...");
+			invalidDigit();
 		}
 	}while(userChoice != 'y' && userChoice != 'Y' && userChoice != 'n' && userChoice != 'N');
 
@@ -128,4 +131,26 @@ void generateTXT()
 void generatePDF()
 {
 	printf("====== GENERATE PDF ======\n\n");
+}
+
+void invalidDigit()
+{
+	textRed();
+	printf("Digit invalid! Insert a valid digit or press CTRL + C to abort...\n");
+	resetText();
+}
+
+void textGreen()
+{
+	printf("\033[0;32m");
+}
+
+void textRed()
+{
+	printf("\033[0;31m");
+}
+
+void resetText()
+{
+	printf("\033[0m");
 }

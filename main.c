@@ -63,7 +63,9 @@ int menu()
 			break;
 		default:
 			system("clear");
-			printf("Digit invalid! Insert a valid digit or press CTRL + C to exit...\n\n");
+			textRed();
+			invalidDigit();
+			resetText();
 			menu();
 			break;
 	}
