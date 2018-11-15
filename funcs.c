@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h> //
-#include<stdio_ext.h> //allow __fpurge - clears buffer
+#include <stdio_ext.h> //allow __fpurge - clears buffer
+
+#define TAX 5 //5 bucks per day
+#define SIZE 2048 //define size for reading file
 
 void invalidDigit();
 void textGreen();
@@ -40,8 +43,8 @@ int registerMovie()
 	printf("\nStatus: %s", newMovie.isRent);
 
 	//set movie tax by day
-	printf("\nTax by day: ");
-	scanf("%f", &newMovie.tax);
+	newMovie.tax = TAX; //5 bucks per day
+	printf("\nTax by day: %.2f \n", newMovie.tax);
 
 	char isInfoRight; 
 
@@ -71,7 +74,7 @@ int registerMovie()
 
 	FILE *myFile;
 	myFile = fopen("files/register.txt", "a");
-	fprintf(myFile, "%s|%s|%s|%.2f;", newMovie.ID, newMovie.title, newMovie.isRent, newMovie.tax); //save movie info
+	fprintf(myFile, "%s@%s#%s$%.2f;", newMovie.ID, newMovie.title, newMovie.isRent, newMovie.tax); //save movie info
 	fclose(myFile);
 
 	textGreen();
@@ -111,11 +114,66 @@ int registerMovie()
 void editMovie()
 {
 	printf("====== EDIT MOVIE ======\n\n");
+
+	FILE *myFile;
+
+	if((myFile = fopen("files/register.txt", "r")) == NULL)
+	{
+		system("clear");
+		textRed();
+		printf("You need to have at least one movie registered. Backing to menu...\n");
+		resetText();
+		return;
+	}
+
+	myFile = fopen("files/register.txt", "r+");
+	
+	fclose(myFile);
+	//system("clear");
 }
 
 void searchMovie()
 {
 	printf("====== SEARCH MOVIE ======\n\n");
+
+	FILE *myFile;
+
+	if((myFile = fopen("files/register.txt", "r")) == NULL)
+	{
+		system("clear");
+		textRed();
+		printf("You need to have at least one movie registered. Backing to menu...\n");
+		resetText();
+		return;
+	}
+
+	myFile = fopen("files/register.txt", "r+");
+
+	char search[100];
+	char fileContent[500];
+
+	printf("Search: ");
+	__fpurge(stdin);
+	fgets(search, sizeof(search), stdin);
+
+	char * helper = NULL;
+
+	while(fgets(fileContent, sizeof(fileContent), myFile) != NULL)
+	{
+		printf("%s", fileContent);
+	}
+
+	helper = strstr(fileContent, search);
+
+	if( helper )
+	{
+		printf("Found!");
+	}
+	else
+	{
+		printf("NOT Found!");
+	}
+
 }
 
 void checkInfo()
