@@ -21,7 +21,6 @@ int registerMovie()
 		char title[100];
 		char ID[16];
 		char isRent[10];
-		float tax;
 	};
 
 	struct movie newMovie;
@@ -42,14 +41,10 @@ int registerMovie()
 	strcpy(newMovie.isRent, "false"); //false because it is not rented while you are registering it
 	printf("\nStatus: %s", newMovie.isRent);
 
-	//set movie tax by day
-	newMovie.tax = TAX; //5 bucks per day
-	printf("\nTax by day: %.2f \n", newMovie.tax);
-
 	char isInfoRight; 
 
 	do{
-		printf("\nSave the data above? Y/N\n");
+		printf("\n\nSave the data above? Y/N\n");
 		__fpurge(stdin);
 		scanf("%c", &isInfoRight);
 
@@ -74,7 +69,7 @@ int registerMovie()
 
 	FILE *myFile;
 	myFile = fopen("files/register.txt", "a");
-	fprintf(myFile, "%s@%s#%s$%.2f;", newMovie.ID, newMovie.title, newMovie.isRent, newMovie.tax); //save movie info
+	fprintf(myFile, "%s;%s;%s\n", newMovie.title, newMovie.ID, newMovie.isRent); //save movie info
 	fclose(myFile);
 
 	textGreen();
@@ -111,27 +106,6 @@ int registerMovie()
 	return 0;
 }
 
-void editMovie()
-{
-	printf("====== EDIT MOVIE ======\n\n");
-
-	FILE *myFile;
-
-	if((myFile = fopen("files/register.txt", "r")) == NULL)
-	{
-		system("clear");
-		textRed();
-		printf("You need to have at least one movie registered. Backing to menu...\n");
-		resetText();
-		return;
-	}
-
-	myFile = fopen("files/register.txt", "r+");
-	
-	fclose(myFile);
-	//system("clear");
-}
-
 void searchMovie()
 {
 	printf("====== SEARCH MOVIE ======\n\n");
@@ -149,31 +123,88 @@ void searchMovie()
 
 	myFile = fopen("files/register.txt", "r+");
 
-	char search[100];
-	char fileContent[500];
+	/*char c;
+	char helper[2];
+	char fileContent[500] = "\0";
 
-	printf("Search: ");
-	__fpurge(stdin);
-	fgets(search, sizeof(search), stdin);
+	while (!feof(myFile)) // while not reach end of file
+ 	{
+  		fscanf(myFile,"%c",&c);
+  		
+  		helper[0] = c; //pass simple char to string
+  		helper[1] = '\0';
 
-	char * helper = NULL;
+  		strcat(fileContent, helper); //append "char" to string
+  	} 
 
-	while(fgets(fileContent, sizeof(fileContent), myFile) != NULL)
+	printf("%s", fileContent);*/
+  	int found = 0;
+  	char search[100];
+  	char line[200];
+  	int test = 0;
+
+  	do{
+	  	printf("Search for a movie by title or code: ");
+	  	__fpurge(stdin);
+	  	fgets(search, sizeof(search), stdin);
+	  	strtok(search, "\n"); //get word to search
+
+	  	found = 0;
+
+	  	while(fgets(line, sizeof(line), myFile))
+	  	{
+	  		test = 45;
+	  		if(strstr(line, search) != NULL) //check if the word exists in the file
+		  	{
+		  		found++;
+
+		  		for(int x = 0; x<sizeof(line); x++)
+		  		{
+		  			if(line[x] == ';')
+		  				line[x] = '\n';
+		  		}
+		  		printf("%s\n", line);
+		  	}
+	  	}
+
+	  	if(found==0)
+	  	{ //WHEN FOUND = 0 IT NEVERS STOP ==== WAITING TO FIX
+	  		system("clear");
+	  		textRed();
+	  		printf("Movie not found! Try again or press CTRL + C to abort...\n");
+	  		resetText();
+	  	}
+  	}while(found==0);
+
+  	getchar();
+  	system("clear");
+	fclose(myFile);
+}
+
+void editMovie()
+{
+	printf("====== EDIT MOVIE ======\n\n");
+
+	FILE *myFile;
+
+	if((myFile = fopen("files/register.txt", "r")) == NULL)
 	{
-		printf("%s", fileContent);
+		system("clear");
+		textRed();
+		printf("You need to have at least one movie registered. Backing to menu...\n");
+		resetText();
+		return;
 	}
 
-	helper = strstr(fileContent, search);
+	myFile = fopen("files/register.txt", "r+");
 
-	if( helper )
-	{
-		printf("Found!");
+	char buffer[128];
+	while((fgets (buffer, 128, myFile))!= NULL) {
+    	printf ("%s",buffer);
 	}
-	else
-	{
-		printf("NOT Found!");
-	}
-
+	
+	fclose(myFile);
+	//system("clear");
 }
 
 void checkInfo()

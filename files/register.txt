@@ -1,1 +1,3 @@
-2878601f@testando1#false$40.00;605c649b@testando50#false$44.00;5770a41d@testando66#false$434.00;5d36a0a3@teste2#false$4.00;541a9bdb@teste1#false$0.00;67dda39d@teste123#false$56.00;1f297b7a@SUPERNEW#false$5.00;
+test1;6a81e9f5;false
+test2;7501c0c9;false
+test45;1034882d;false
