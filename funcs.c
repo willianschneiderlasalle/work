@@ -5,7 +5,6 @@
 #include <stdio_ext.h> //allow __fpurge - clears buffer
 
 #define TAX 5 //5 bucks per day
-#define SIZE 2048 //define size for reading file
 
 void invalidDigit();
 void textGreen();
