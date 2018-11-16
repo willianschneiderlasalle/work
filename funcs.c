@@ -123,56 +123,70 @@ void searchMovie()
 
 	myFile = fopen("files/register.txt", "r+");
 
-	/*char c;
-	char helper[2];
-	char fileContent[500] = "\0";
-
-	while (!feof(myFile)) // while not reach end of file
- 	{
-  		fscanf(myFile,"%c",&c);
-  		
-  		helper[0] = c; //pass simple char to string
-  		helper[1] = '\0';
-
-  		strcat(fileContent, helper); //append "char" to string
-  	} 
-
-	printf("%s", fileContent);*/
   	int found = 0;
   	char search[100];
   	char line[200];
-  	int test = 0;
+  	char _haveToClean = '\0';
+  	char newSearch;
 
   	do{
+  		if(_haveToClean = 'y')
+  		{
+  			getchar();
+  			system("clear");
+  			_haveToClean = 'n';
+  		}
+
+  		memset(search, 0, sizeof(search));
+  		memset(line, 0, sizeof(line));
+
+  		fseek(myFile, 0, SEEK_SET);
+
 	  	printf("Search for a movie by title or code: ");
 	  	__fpurge(stdin);
-	  	fgets(search, sizeof(search), stdin);
-	  	strtok(search, "\n"); //get word to search
-
-	  	found = 0;
+	  	fgets(search, sizeof(search), stdin); //get word to search
+	  	strtok(search, "\n"); //remove \n that fgets insert
 
 	  	while(fgets(line, sizeof(line), myFile))
 	  	{
-	  		test = 45;
 	  		if(strstr(line, search) != NULL) //check if the word exists in the file
-		  	{
-		  		found++;
-
+		  	{  	
 		  		for(int x = 0; x<sizeof(line); x++)
 		  		{
 		  			if(line[x] == ';')
-		  				line[x] = '\n';
+		  				line[x] = '\n'; //replace ; for a break line
 		  		}
-		  		printf("%s\n", line);
+		  		printf("\n%s", line); //print line content
+		  		found=1;
 		  	}
 	  	}
 
-	  	if(found==0)
-	  	{ //WHEN FOUND = 0 IT NEVERS STOP ==== WAITING TO FIX
+	  	if(found==0) //if haven't found anything, show an error
+	  	{
 	  		system("clear");
 	  		textRed();
 	  		printf("Movie not found! Try again or press CTRL + C to abort...\n");
 	  		resetText();
+	  		_haveToClean = 'y';
+	  	}
+
+	  	if(found == 1)
+	  	{
+	  		do
+	  		{
+		  		printf("\nSearch for another movies? Y/N\n");
+		  		__fpurge(stdin);
+		  		scanf("%c", &newSearch);
+
+		  		if(newSearch != 'y' && newSearch != 'Y' && newSearch != 'n' && newSearch != 'N'){
+		  			system("clear");
+		  			invalidDigit();
+		  		}
+
+		  		if(newSearch == 'y' || newSearch == 'Y')
+		  			found = 0;
+
+	  		}while(newSearch != 'y' && newSearch != 'Y' && newSearch != 'n' && newSearch != 'N');
 	  	}
   	}while(found==0);
 
