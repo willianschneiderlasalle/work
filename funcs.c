@@ -223,7 +223,37 @@ void editMovie()
 
 void checkInfo()
 {
-	printf("====== CHECK MOVIE INFO ======\n\n");
+	printf("====== MOVIES REGISTERED ======\n");
+
+	FILE *myFile;
+
+	if((myFile = fopen("files/register.txt", "r")) == NULL)
+	{
+		system("clear");
+		textRed();
+		printf("You need to have at least one movie registered. Backing to menu...\n");
+		resetText();
+		return;
+	}
+
+	myFile = fopen("files/register.txt", "r+");
+
+	char line[200];
+
+	while(fgets(line, sizeof(line), myFile))
+	  	{
+	  		for(int x = 0; x<sizeof(line); x++)
+	  		{
+	  			if(line[x] == ';')
+	  				line[x] = '\n'; //replace ; for a break line
+	  		}
+	  		printf("\n%s", line); //print line content
+	  	}
+
+	__fpurge(stdin);
+	printf("\nPress any key to go back to menu or press CTRL+C to abort...\n");
+	getchar();
+	system("clear");
 }
 
 void generateTXT()

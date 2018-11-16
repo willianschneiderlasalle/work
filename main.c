@@ -23,7 +23,7 @@ int menu()
 	printf("1 - Register new movie\n");
 	printf("2 - Edit an existent movie\n");
 	printf("3 - Search movie by title or ID\n");
-	printf("4 - Check movie info\n");
+	printf("4 - Check movies info\n");
 	printf("5 - Generate TXT report\n");
 	printf("6 - Generate PDF report \n");
 	printf("7 - Exit\n\n");
