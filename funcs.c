@@ -426,7 +426,7 @@ void editMovie()
 	  			}
 	  		}
 
-	  		if(strcmp(search, title) == 0) //check if there is a title with the word searched
+		  		if(strcmp(search, title) == 0) //check if there is a title with the word searched
 	  		{
 				printf("\n%d. %.12s\t\t%s\t%s\n", count, title, code, status); 
 
