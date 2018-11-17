@@ -521,7 +521,7 @@ void editMovie()
 	  	{
 	  		do
 	  		{
-		  		printf("\n\nSearch for another movies? Y/N\n");
+		  		printf("\n\nWill you edit anything else? Y/N\n");
 		  		__fpurge(stdin);
 		  		scanf("%c", &newSearch);
 
@@ -699,7 +699,7 @@ void textRed()
 
 void textYellow()
 {
-	printf("\033[[0;33m");
+	printf("\033[0;33m");
 }
 
 void resetText()
