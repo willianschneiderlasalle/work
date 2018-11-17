@@ -11,7 +11,9 @@
 void invalidDigit();
 void textGreen();
 void textRed();
+void textYellow();
 void resetText();
+void save();
 
 int registerMovie()
 {
@@ -349,7 +351,7 @@ void editMovie()
 
 	  	char editWhat[10];
 	  	char newTitle[200];
-	  	char save;
+	  	char willSave;
 
 	  	while(fgets(line, sizeof(line), myFile))
 	  	{
@@ -475,23 +477,24 @@ void editMovie()
 				{
 				  	printf("\n\nWould you like to save this changes? Y/N\n");
 			  		__fpurge(stdin);
-			  		scanf("%s", &save); //get word to search
+			  		scanf("%s", &willSave); //get word to search
 
-			  		if(save == 'y' || save == 'Y')
+			  		if(willSave == 'y' || willSave == 'Y')
 			  		{
 			  			save();
 			  		}
-			  		else if(save == 'n' || save == 'N')
+			  		else if(willSave == 'n' || willSave == 'N')
 			  		{
 			  			system("clear");
-			  			textRed();
-			  			printf("Changes discarded!")
+			  			textYellow();
+			  			printf("Changes discarded!");
+			  			resetText();
 			  		}
 			  		else
 			  		{
 			  			invalidDigit();
 			  		}
-				}while(save != 'y' && save != 'Y' && save != 'N' && save != 'n')
+				}while(willSave != 'y' && willSave != 'Y' && willSave != 'N' && willSave != 'n');
 	  		}
 
 	  		//printf("\n%d. %.12s\t\t%s\t%s", count, title, code, status); //print line content
@@ -679,6 +682,11 @@ void invalidDigit()
 	resetText();
 }
 
+void save()
+{
+
+}
+
 void textGreen()
 {
 	printf("\033[0;32m");
@@ -687,6 +695,11 @@ void textGreen()
 void textRed()
 {
 	printf("\033[0;31m");
+}
+
+void textYellow()
+{
+	printf("\033[[0;33m");
 }
 
 void resetText()
