@@ -40,7 +40,6 @@ int registerMovie()
 			system("clear");
 			textRed();
 			printf("Title must have more than 4 characters! Try again...");
-			getchar();
 			resetText();
 		}		
 
@@ -85,7 +84,10 @@ int registerMovie()
 	}while(isInfoRight != 'y' && isInfoRight != 'Y' && isInfoRight != 'n' && isInfoRight != 'N');
 
 	FILE *myFile;
-	myFile = fopen("files/register.txt", "a");
+
+	char fileName[25] = "files/register.txt";
+
+	myFile = fopen(fileName, "a");
 	fprintf(myFile, "%s|%s;%s\n", newMovie.title, newMovie.ID, newMovie.isRent); //save movie info
 	fclose(myFile);
 
@@ -129,7 +131,9 @@ void searchMovie()
 
 	FILE *myFile;
 
-	if((myFile = fopen("files/register.txt", "r")) == NULL)
+	char fileName[25] = "files/register.txt";
+
+	if((myFile = fopen(fileName, "r")) == NULL)
 	{
 		system("clear");
 		textRed();
@@ -138,7 +142,7 @@ void searchMovie()
 		return;
 	}
 
-	myFile = fopen("files/register.txt", "r+");
+	myFile = fopen(fileName, "r+");
 
   	int found = 0;
   	char search[100];
@@ -301,7 +305,9 @@ void editMovie()
 
 	FILE *myFile;
 
-	if((myFile = fopen("files/register.txt", "r")) == NULL)
+	char fileName[25] = "files/register.txt";
+
+	if((myFile = fopen(fileName, "r")) == NULL)
 	{
 		system("clear");
 		textRed();
@@ -310,7 +316,7 @@ void editMovie()
 		return;
 	}
 
-	myFile = fopen("files/register.txt", "r+");
+	myFile = fopen(fileName, "r+");
 
   	int found = 0;
   	char search[100];
@@ -326,10 +332,10 @@ void editMovie()
   			_haveToClean = 'n';
   		}
 
-  		memset(search, 0, sizeof(search));
-  		memset(line, 0, sizeof(line));
+  		memset(search, 0, sizeof(search)); //clear search variable
+  		memset(line, 0, sizeof(line)); //clear line variable
 
-  		fseek(myFile, 0, SEEK_SET);
+  		fseek(myFile, 0, SEEK_SET); //point to the beggining of the file
 
 	  	printf("Type the title of the movie you would like to edit: ");
 	  	__fpurge(stdin);
@@ -353,7 +359,7 @@ void editMovie()
 	  	char newTitle[200];
 	  	char willSave;
 
-	  	while(fgets(line, sizeof(line), myFile))
+	  	while(fgets(line, sizeof(line), myFile)) //check every line of the file
 	  	{
 	  		for(int x=0; x<sizeof(title); x++) //clear title
 	  			title[x] = '\0';
@@ -420,25 +426,37 @@ void editMovie()
 	  			}
 	  		}
 
-	  		if(strcmp(search, title) == 0)
+	  		if(strcmp(search, title) == 0) //check if there is a title with the word searched
 	  		{
-				printf("\n%d. %.12s\t\t%s\t%s", count, title, code, status); 
+				printf("\n%d. %.12s\t\t%s\t%s\n", count, title, code, status); 
 
 				found = 1;
 
 				do{
-					printf("\n\nWhat would like to edit? Title / Status: ");
+					printf("\nWhat would like to edit? Title / Status: ");
 					__fpurge(stdin);
 				  	fgets(editWhat, sizeof(editWhat), stdin); //get word to search
 				  	strtok(editWhat, "\n"); //remove \n that fgets insert
 
-				  	if(strcmp(editWhat, "Title") == 0 || strcmp(editWhat, "title") == 0)
+				  	if(strcmp(editWhat, "Title") == 0 || strcmp(editWhat, "title") == 0) //edit title
 				  	{
-				  		printf("New title: ");
-				  		__fpurge(stdin);
-				  		fgets(newTitle, sizeof(newTitle), stdin); //get word to search
-				  		strtok(newTitle, "\n"); //remove \n that fgets insert
-						
+				  		do
+				  		{
+					  		printf("New title: ");
+					  		__fpurge(stdin);
+					  		fgets(newTitle, sizeof(newTitle), stdin); //get word to search
+					  		strtok(newTitle, "\n"); //remove \n that fgets insert
+
+					  		if(strlen(newTitle) <= 4)
+					  		{
+		  						system("clear");
+								textRed();
+								printf("Title must have more than 4 characters! Try again...\n");
+								resetText();
+					  		}
+
+						}while (strlen(newTitle) <= 4);
+
 						textRed();
 				  		printf("\nCurrent title = %s", title);
 				  		textGreen();
@@ -447,7 +465,7 @@ void editMovie()
 				  		resetText();
 
 				  	}
-				    else if(strcmp(editWhat, "Status") == 0 || strcmp(editWhat, "status") == 0)
+				    else if(strcmp(editWhat, "Status") == 0 || strcmp(editWhat, "status") == 0) //edit status
 				  	{
 				  		textRed();
 				  		printf("\nCurrent status = %s", status);
@@ -469,6 +487,7 @@ void editMovie()
 				  	}
 				  	else
 				  	{
+				  		printf("\n");
 				  		invalidDigit();
 				  	}
 			  	}while(strcmp(editWhat, "Title") != 0 && strcmp(editWhat, "title") != 0 && (strcmp(editWhat, "Status") != 0 && strcmp(editWhat, "status") != 0));
@@ -481,7 +500,7 @@ void editMovie()
 
 			  		if(willSave == 'y' || willSave == 'Y')
 			  		{
-			  			save();
+			  			save(editWhat, title, code, status, count, line); //call function to save the changes
 			  		}
 			  		else if(willSave == 'n' || willSave == 'N')
 			  		{
@@ -496,8 +515,6 @@ void editMovie()
 			  		}
 				}while(willSave != 'y' && willSave != 'Y' && willSave != 'N' && willSave != 'n');
 	  		}
-
-	  		//printf("\n%d. %.12s\t\t%s\t%s", count, title, code, status); //print line content
 	  		
 	  		count++;
 
@@ -510,7 +527,6 @@ void editMovie()
 
 	  	if(found==0) //if haven't found anything, show an error
 	  	{
-	  		//system("clear");
 	  		textRed();
 	  		printf("\n\nMovie not found! Try again or press CTRL + C to abort...\n");
 	  		resetText();
@@ -531,7 +547,11 @@ void editMovie()
 		  		}
 
 		  		if(newSearch == 'y' || newSearch == 'Y')
+		  		{
+		  			fclose(myFile);
+		  			myFile = fopen(fileName, "r+");
 		  			found = 0;
+		  		}
 
 	  		}while(newSearch != 'y' && newSearch != 'Y' && newSearch != 'n' && newSearch != 'N');
 	  	}
@@ -548,7 +568,9 @@ void checkInfo()
 
 	FILE *myFile;
 
-	if((myFile = fopen("files/register.txt", "r")) == NULL)
+	char fileName[25] = "files/register.txt";
+
+	if((myFile = fopen(fileName, "r")) == NULL)
 	{
 		system("clear");
 		textRed();
@@ -557,7 +579,7 @@ void checkInfo()
 		return;
 	}
 
-	myFile = fopen("files/register.txt", "r+");
+	myFile = fopen(fileName, "r+");
 
   	int found = 0;
   	char line[200];
@@ -682,9 +704,93 @@ void invalidDigit()
 	resetText();
 }
 
-void save()
+void save(char *change, char *title, char *code, char *status, char *index, char *line)
 {
+	char newLine[200] = "";
+	
+	strcat(newLine, title);
+	strcat(newLine, "|");
+	strcat(newLine, code);
+	strcat(newLine, ";");
+	strcat(newLine, status);
+	strcat(newLine, "\n");
+		
+	FILE *myFile;
+	FILE *tempFile;
 
+	char fileName[25] = "files/register.txt";
+	char tempName[25] = "files/temp.txt";
+
+	if((myFile = fopen(fileName, "r")) == NULL)
+	{
+		system("clear");
+		textRed();
+		printf("You need to have at least one movie registered. Backing to menu...\n");
+		resetText();
+		return;
+	}
+
+	myFile = fopen(fileName, "r+");
+
+	fseek(myFile, 0, SEEK_SET);
+
+	int count = 0;
+	char fileLine[200];
+
+	int newLineCount = strlen(newLine)+1;
+
+	while (fgets(fileLine, sizeof(fileLine), myFile))
+	{
+	    count = strlen(fileLine) + count;
+    }
+
+	fseek(myFile, 0, SEEK_SET);
+
+	char fileContent[count];	
+
+	strcpy(fileContent, "a");
+
+	memset(fileContent, 0, sizeof(fileContent));
+
+	while(fgets(fileLine, sizeof(fileLine), myFile)) //check every line of the file
+	{
+		if(strcmp(line, fileLine) ==  0)
+		{
+			strcat(fileContent, newLine);
+		}
+		else
+		{
+			strcat(fileContent, fileLine); //when finish the loop, fileContent will have the new whole file content
+		} 
+	}
+
+	fclose(myFile);
+
+	tempFile = fopen(tempName, "a");
+	fprintf(tempFile, "%s", fileContent);
+	fclose(tempFile);
+
+	int del;
+	int rnm;
+
+	del = remove(fileName);
+	rnm = rename(tempName, fileName);
+
+	getchar();
+
+	if(del == 0 && rnm == 0)
+	{
+		textGreen();
+		printf("Saved successfully!");
+		resetText();		
+	}
+	else
+	{
+		textRed();
+		printf("Something went wrong... Aborting...");
+		resetText();
+		return;
+	}
 }
 
 void textGreen()
