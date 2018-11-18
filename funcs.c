@@ -14,6 +14,7 @@ void textRed();
 void textYellow();
 void resetText();
 void save();
+int checkDupeTitle();
 
 int registerMovie()
 {
@@ -39,9 +40,9 @@ int registerMovie()
 		{
 			system("clear");
 			textRed();
-			printf("Title must have more than 4 characters! Try again...");
+			printf("Title must have more than 4 characters! Try again...\n");
 			resetText();
-		}		
+		}
 
 	}while(strlen(newMovie.title) <= 4);
 
@@ -332,7 +333,7 @@ void editMovie()
   			_haveToClean = 'n';
   		}
 
-  		memset(search, 0, sizeof(search)); //clear search variable
+  		//memset(search, 0, sizeof(search)); //clear search variable
   		memset(line, 0, sizeof(line)); //clear line variable
 
   		fseek(myFile, 0, SEEK_SET); //point to the beggining of the file
@@ -426,14 +427,18 @@ void editMovie()
 	  			}
 	  		}
 
-		  		if(strcmp(search, title) == 0) //check if there is a title with the word searched
+	  			//printf("SEARCH %s AND LENGHT %zu", search, strlen(search));
+	  			//printf("SEARCH %s AND LENGHT %zu", code, strlen(code));
+
+
+		  		if(strcmp(search, title) == 0 || strcmp(search,code) == 0) //check if there is a title with the word searched
 	  		{
 				printf("\n%d. %.12s\t\t%s\t%s\n", count, title, code, status); 
 
 				found = 1;
 
 				do{
-					printf("\nWhat would like to edit? Title / Status: ");
+					printf("\nWhat would like to edit? title / status: ");
 					__fpurge(stdin);
 				  	fgets(editWhat, sizeof(editWhat), stdin); //get word to search
 				  	strtok(editWhat, "\n"); //remove \n that fgets insert
@@ -811,4 +816,66 @@ void textYellow()
 void resetText()
 {
 	printf("\033[0m");
+}
+
+int checkDupeTitle(char *search)
+{
+	FILE *myFile;
+
+	char fileName[25] = "files/register.txt";
+
+	if((myFile = fopen(fileName, "r")) == NULL)
+	{
+		system("clear");
+		textRed();
+		printf("You need to have at least one movie registered. Backing to menu...\n");
+		resetText();
+		return 1;
+	}
+
+	myFile = fopen(fileName, "r+");
+
+  	int found = 0;
+  	char line[200];
+  	char newSearch;
+
+		memset(search, 0, sizeof(search)); //clear search variable
+		memset(line, 0, sizeof(line)); //clear line variable
+
+		fseek(myFile, 0, SEEK_SET); //point to the beggining of the file
+
+  	char title[200];
+  	char code[10];
+  	char status[10];
+
+  	while(fgets(line, sizeof(line), myFile)) //check every line of the file
+  	{
+  		for(int x=0; x<sizeof(title); x++) //clear title
+  			title[x] = '\0';
+
+  		for(int x = 0; x<strlen(line); x++) //get movie title
+  		{
+  			if(line[x] == '|')
+  				continue;
+  			
+  			title[x] = line[x];
+  		}
+
+	  		if(strcmp(search, title) == 0) //check if there is a title with the word searched
+  		{
+			found++;
+		}
+  	}
+
+  	if(found > 1)
+  	{
+  		return 1;
+  	}
+  	else
+  	{
+  		return 0;
+  	}
+
+  	system("clear");
+	fclose(myFile);	
 }
