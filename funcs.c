@@ -6,7 +6,6 @@
 
 #define LOW 268435456
 #define HIGH 4294967295
-#define TAX 5 //5 bucks per day
 
 void invalidDigit();
 void textGreen();
@@ -15,6 +14,7 @@ void textYellow();
 void resetText();
 void save();
 int checkDupeTitle();
+void createUser();
 
 int registerMovie()
 {
@@ -252,7 +252,12 @@ void searchMovie()
 		  			}
 		  		}
 
-		  		printf("\n%d. %.12s\t\t%s\t%s", count, title, code, status); //print line content
+		  		if(count < 10)
+		  			printf("\n00%d. %.10s\t\t%s\t%s", count, title, code, status); //print line content
+		  		else if(count >= 10 && count < 100)
+		  			printf("\n0%d. %.10s\t\t%s\t%s", count, title, code, status); //print line content
+		  		else if(count >= 100)
+		  			printf("\n%d. %.10s\t\t%s\t%s", count, title, code, status); //print line content
 		  		
 		  		count++;
 
@@ -477,8 +482,7 @@ void editMovie()
 				  			strcpy(status, "false");
 				  			printf("\nNew status = %s", status);
 				  		}
-
-				  		if(strcmp(status, "false") == 0)
+				  		else if(strcmp(status, "false") == 0)
 				  		{
 				  			strcpy(status, "true");
 				  			printf("\nNew status = %s", status);
@@ -686,6 +690,26 @@ void checkInfo()
   	getchar();
   	system("clear");
 	fclose(myFile);
+}
+
+void rent()
+{
+	char movie[100];
+
+	printf("====== RENT TO USER ======\n\n");
+	printf("Which movie would you like to rent? ");
+	__fpurge(stdin);
+	fgets(movie, sizeof(movie), stdin);
+	strtok(movie, "\n"); //remove \n that fgets insert
+
+
+
+
+}
+
+void createUser()
+{
+
 }
 
 void generatePDF()

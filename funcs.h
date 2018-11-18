@@ -1,5 +1,7 @@
 int registerMovie();
 
+void rent();
+
 void editMovie();
 
 void searchMovie();
