@@ -24,9 +24,8 @@ int menu()
 	printf("2 - Edit an existent movie\n");
 	printf("3 - Search movie by title or ID\n");
 	printf("4 - Check movies info\n");
-	printf("5 - Generate TXT report\n");
-	printf("6 - Generate PDF report \n");
-	printf("7 - Exit\n\n");
+	printf("5 - Generate PDF report \n");
+	printf("6 - Exit\n\n");
 
 	__fpurge(stdin);
 	scanf("%c", &menuChoice);
@@ -51,13 +50,9 @@ int menu()
 			break;
 		case '5':
 			system("clear");
-			generateTXT();
-			break;
-		case '6':
-			system("clear");
 			generatePDF();
 			break;
-		case '7':
+		case '6':
 			printf("Exiting...\n");
 			return 0;
 			break;

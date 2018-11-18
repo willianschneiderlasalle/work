@@ -427,11 +427,7 @@ void editMovie()
 	  			}
 	  		}
 
-	  			//printf("SEARCH %s AND LENGHT %zu", search, strlen(search));
-	  			//printf("SEARCH %s AND LENGHT %zu", code, strlen(code));
-
-
-		  		if(strcmp(search, title) == 0 || strcmp(search,code) == 0) //check if there is a title with the word searched
+		  		if((strcmp(search, title) == 0 || strcmp(search,code) == 0) && checkDupeTitle(search, myFile) == 0) //check if there is a title with the word searched
 	  		{
 				printf("\n%d. %.12s\t\t%s\t%s\n", count, title, code, status); 
 
@@ -530,7 +526,7 @@ void editMovie()
 	  		statusIndex = 0;
 	  	}
 
-	  	if(found==0) //if haven't found anything, show an error
+	  	if(found==0 && checkDupeTitle(search, myFile) == 0) //if haven't found anything, show an error
 	  	{
 	  		textRed();
 	  		printf("\n\nMovie not found! Try again or press CTRL + C to abort...\n");
@@ -560,7 +556,7 @@ void editMovie()
 
 	  		}while(newSearch != 'y' && newSearch != 'Y' && newSearch != 'n' && newSearch != 'N');
 	  	}
-  	}while(found==0);
+  	}while(found==0 || checkDupeTitle(search, myFile) == 1);
 
   	getchar();
   	system("clear");
@@ -692,11 +688,6 @@ void checkInfo()
 	fclose(myFile);
 }
 
-void generateTXT()
-{
-	printf("====== GENERATE TXT ======\n\n");
-}
-
 void generatePDF()
 {
 	printf("====== GENERATE PDF ======\n\n");
@@ -786,7 +777,7 @@ void save(char *change, char *title, char *code, char *status, char *index, char
 	if(del == 0 && rnm == 0)
 	{
 		textGreen();
-		printf("Saved successfully!");
+		printf("\nSaved successfully!");
 		resetText();		
 	}
 	else
@@ -818,35 +809,16 @@ void resetText()
 	printf("\033[0m");
 }
 
-int checkDupeTitle(char *search)
+int checkDupeTitle(char *search, FILE *myFile)
 {
-	FILE *myFile;
-
-	char fileName[25] = "files/register.txt";
-
-	if((myFile = fopen(fileName, "r")) == NULL)
-	{
-		system("clear");
-		textRed();
-		printf("You need to have at least one movie registered. Backing to menu...\n");
-		resetText();
-		return 1;
-	}
-
-	myFile = fopen(fileName, "r+");
-
   	int found = 0;
   	char line[200];
-  	char newSearch;
 
-		memset(search, 0, sizeof(search)); //clear search variable
-		memset(line, 0, sizeof(line)); //clear line variable
+	memset(line, 0, sizeof(line)); //clear line variable
 
-		fseek(myFile, 0, SEEK_SET); //point to the beggining of the file
+	fseek(myFile, 0, SEEK_SET); //point to the beggining of the file
 
   	char title[200];
-  	char code[10];
-  	char status[10];
 
   	while(fgets(line, sizeof(line), myFile)) //check every line of the file
   	{
@@ -869,6 +841,10 @@ int checkDupeTitle(char *search)
 
   	if(found > 1)
   	{
+  		system("clear");
+  		textRed();
+  		printf("More than one movie has this title, you must search by movie ID...\n");
+  		resetText();
   		return 1;
   	}
   	else
@@ -877,5 +853,4 @@ int checkDupeTitle(char *search)
   	}
 
   	system("clear");
-	fclose(myFile);	
 }

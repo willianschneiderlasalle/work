@@ -6,8 +6,6 @@ void searchMovie();
 
 void checkInfo();
 
-void generateTXT();
-
 void generatePDF();
 
 void invalidDigit(); //error message
