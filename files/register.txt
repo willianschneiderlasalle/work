@@ -1,4 +1,4 @@
-MEGAMOVIE|724f12d5;false
+MEGAMOVIE|724f12d5;true
 Movie2|2a03910a;false
 Movie3|61a7243f;false
 Movie4|18a1774e;false

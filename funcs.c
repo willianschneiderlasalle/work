@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h> //
+#include <time.h> //used by rand()
+#include <sys/time.h> //gettimeoftheday
 #include <stdio_ext.h> //allow __fpurge - clears buffer
 
 #define LOW 268435456
@@ -15,6 +16,7 @@ void resetText();
 void save();
 int checkDupeTitle();
 void createUser();
+int loadUser();
 
 int registerMovie()
 {
@@ -694,22 +696,47 @@ void checkInfo()
 
 void rent()
 {
-	char movie[100];
-
-	printf("====== RENT TO USER ======\n\n");
-	printf("Which movie would you like to rent? ");
-	__fpurge(stdin);
-	fgets(movie, sizeof(movie), stdin);
-	strtok(movie, "\n"); //remove \n that fgets insert
-
-
-
 
 }
 
 void createUser()
 {
+	struct user
+	{
+		char name[50];
+		char phone[20];
+		char cpf[15];
+	};
 
+	struct user newUser;
+
+	printf("\nName: ");
+	__fpurge(stdin);
+	fgets(newUser.name, sizeof(newUser.name), stdin);
+	strtok(newUser.name, "\n"); //remove \n that fgets insert	
+
+	printf("\nPhone: ");
+	__fpurge(stdin);
+	fgets(newUser.phone, sizeof(newUser.phone), stdin);
+	strtok(newUser.phone, "\n"); //remove \n that fgets insert	
+
+	printf("\nCPF: ");
+	__fpurge(stdin);
+	fgets(newUser.cpf, sizeof(newUser.cpf), stdin);
+	strtok(newUser.cpf, "\n"); //remove \n that fgets insert	
+
+	FILE *userFile;
+	char userFileName[25] = "files/users.txt";
+
+	userFile = fopen(userFileName, "a");
+
+	fprintf(userFile, "%s|%s;%s\n", newUser.name, newUser.phone, newUser.cpf);
+	fclose(userFile);
+}
+
+int loadUser(char *cpf)
+{
+	return 1;
 }
 
 void generatePDF()
