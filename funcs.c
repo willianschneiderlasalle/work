@@ -169,7 +169,7 @@ void searchMovie()
 	  	printf("Search for a movie by title or code: ");
 	  	__fpurge(stdin);
 	  	fgets(search, sizeof(search), stdin); //get word to search
-	  	printf("\n   TITLE\t\tCODE\t\tRENTED?");
+	  	printf("\n     TITLE\t\tCODE\t\tRENTED?");
 	  	strtok(search, "\n"); //remove \n that fgets insert
 
 	  	int count = 1;
@@ -348,7 +348,7 @@ void editMovie()
 	  	printf("Type the title of the movie you would like to edit: ");
 	  	__fpurge(stdin);
 	  	fgets(search, sizeof(search), stdin); //get word to search
-	  	printf("\n   TITLE\t\tCODE\t\tRENTED?");
+	  	printf("\n     TITLE\t\tCODE\t\tRENTED?");
 	  	strtok(search, "\n"); //remove \n that fgets insert
 
 	  	int count = 1;
@@ -571,8 +571,6 @@ void editMovie()
 
 void checkInfo()
 {
-	printf("====== MOVIES REGISTERED ======\n");
-
 	FILE *myFile;
 
 	char fileName[25] = "files/register.txt";
@@ -595,7 +593,7 @@ void checkInfo()
 
 	fseek(myFile, 0, SEEK_SET);
 
-  	printf("\n   TITLE\t\tCODE\t\tRENTED?");
+  	printf("\n     TITLE\t\tCODE\t\tRENTED?");
 
   	int count = 1;
 
@@ -676,7 +674,12 @@ void checkInfo()
   			}
   		}
 
-  		printf("\n%d. %.12s\t\t%s\t%s", count, title, code, status); //print line content
+  		if(count < 10)
+	  		printf("\n00%d. %.10s\t\t%s\t%s", count, title, code, status); //print line content
+  		else if(count >= 10 && count < 100)
+  			printf("\n0%d. %.10s\t\t%s\t%s", count, title, code, status); //print line content
+  		else if(count >= 100)
+  			printf("\n%d. %.10s\t\t%s\t%s", count, title, code, status); //print line content
   		
   		count++;
 
@@ -688,15 +691,250 @@ void checkInfo()
 	}
 
 	printf("\n");
-  	__fpurge(stdin);
-  	getchar();
-  	system("clear");
 	fclose(myFile);
 }
 
 void rent()
 {
+	FILE *myFile;
 
+	char fileName[25] = "files/register.txt";
+
+	if((myFile = fopen(fileName, "r")) == NULL)
+	{
+		return;
+	}
+
+	myFile = fopen(fileName, "r+");
+
+  	int found = 0;
+  	char search[100];
+  	char line[200];
+  	char _haveToClean = '\0';
+  	char newSearch;
+  	char cpf[15];
+
+
+  	do{
+  		if(_haveToClean == 'y')
+  		{
+  			getchar();
+  			system("clear");
+  			_haveToClean = 'n';
+  		}
+
+  		printf("====== RENT MOVIE ======\n");
+
+  		checkInfo();
+
+  		//memset(search, 0, sizeof(search)); //clear search variable
+  		memset(line, 0, sizeof(line)); //clear line variable
+
+  		fseek(myFile, 0, SEEK_SET); //point to the beggining of the file
+
+	  	printf("\nEnter the movie you would like to rent: ");
+	  	__fpurge(stdin);
+	  	fgets(search, sizeof(search), stdin); //get word to search
+	  	//printf("\n     TITLE\t\tCODE\t\tRENTED?");
+	  	strtok(search, "\n"); //remove \n that fgets insert
+
+	  	int count = 1;
+
+	  	char title[200];
+	  	char code[10];
+	  	char status[10];
+	  	
+	  	int codeHelper;
+	  	int codeIndex = 0;
+
+	  	int statusHelper;
+	  	int statusIndex = 0;
+
+	  	char editWhat[10];
+	  	char newTitle[200];
+	  	char willSave;
+
+	  	while(fgets(line, sizeof(line), myFile)) //check every line of the file
+	  	{
+	  		for(int x=0; x<sizeof(title); x++) //clear title
+	  			title[x] = '\0';
+
+	  		for(int x = 0; x<strlen(line); x++) //get movie title
+	  		{
+	  			if(line[x] == '|')
+	  				continue;
+	  			
+	  			title[x] = line[x];
+	  		}
+
+	  		for(int y=0; y<sizeof(code); y++) //clear code
+	  			code[y] = '\0';
+
+	  		for(int y=0; y<strlen(line); y++) //get code
+	  		{
+	  			if(line[y] == '|')
+	  			{
+	  				codeHelper = 1;
+	  			}
+
+	  			if(line[y] == ';')
+	  			{
+	  				codeHelper = 0;
+	  				continue;
+	  			}
+
+	  			if(codeHelper == 1)
+	  			{
+	  				code[codeIndex] = line[y+1];
+	  				
+	  				if(code[codeIndex] == ';')
+	  					code[codeIndex] = '\0';
+
+	  				codeIndex++;
+	  			}
+	  		}
+
+	  		for(int z=0; z<sizeof(status); z++) //clear status
+	  			status[z] = '\0';
+
+	  		for(int z=0; z<strlen(line); z++) //get status
+	  		{
+	  			if(line[z] == ';')
+	  			{
+	  				statusHelper = 1;
+	  			}
+
+	  			if(line[z] == '\n')
+	  			{
+	  				statusHelper = 0;
+	  				continue;
+	  			}
+
+	  			if(statusHelper == 1)
+	  			{
+	  				status[statusIndex] = line[z+1];
+	  				
+	  				if(status[statusIndex] == '\n')
+	  					status[statusIndex] = '\0';
+
+	  				statusIndex++;
+	  			}
+	  		}
+
+		  		if((strcmp(search, title) == 0 || strcmp(search,code) == 0) && checkDupeTitle(search, myFile) == 0) //check if there is a title/code with the word searched
+	  		{
+				//printf("\n%d. %.12s\t\t%s\t%s\n", count, title, code, status); 
+
+				found = 1;
+
+		  		if(strcmp(status,"true") == 0)
+		  		{
+		  			textRed();
+		  			system("clear");
+		  			printf("The movie typed is already rented! Try again with another movie...\n");
+		  			resetText();
+		  			return;
+		  		}
+		  		else
+		  		{
+		  			textGreen();
+		  			printf("\nMovie found!");
+		  			resetText();
+		  			strcpy(status, "true");
+			  	}
+
+				do
+				{
+				  	printf("\n\nAre you sure you want to rent this movie? Y/N\n");
+			  		__fpurge(stdin);
+			  		scanf("%s", &willSave); //get word to search
+
+			  		if(willSave == 'y' || willSave == 'Y')
+			  		{
+			  			system("clear");
+			  			printf("Enter client CPF: ");
+	  					__fpurge(stdin);
+	  					fgets(cpf, sizeof(cpf), stdin);
+	  					strtok(cpf, "\n"); 
+
+	  					if(loadUser(cpf) == 0)
+	  					{
+	  						textGreen();
+	  						printf("\nUser found!");
+	  						resetText();
+	  					}
+	  					else
+	  					{
+	  						textRed();
+	  						printf("\nUser not found!");
+	  						resetText();
+	  						printf("\nLet's register a new one...\n\n");
+	  						createUser();
+	  					}
+
+	  					//ADD TO CLIENT FILE THE MOVIE RENTED BY EACH USER
+	  					//CREATE "DELIVERY" FUNCTION
+
+			  			save("status", title, code, status, count, line); //call function to save the changes
+			  		}
+			  		else if(willSave == 'n' || willSave == 'N')
+			  		{
+			  			system("clear");
+			  			textYellow();
+			  			printf("Changes discarded!");
+			  			resetText();
+			  		}
+			  		else
+			  		{
+			  			invalidDigit();
+			  		}
+				}while(willSave != 'y' && willSave != 'Y' && willSave != 'N' && willSave != 'n');
+	  		}
+	  		
+	  		count++;
+
+	  		codeHelper = 0;
+	  		codeIndex = 0;
+
+	  		statusHelper = 0;
+	  		statusIndex = 0;
+	  	}
+
+	  	if(found==0 && checkDupeTitle(search, myFile) == 0) //if haven't found anything, show an error
+	  	{
+	  		textRed();
+	  		printf("\n\nMovie not found! Try again or press CTRL + C to abort...\n");
+	  		resetText();
+	  		_haveToClean = 'y';
+	  	}
+
+	  	if(found == 1)
+	  	{
+	  		do
+	  		{
+		  		printf("\n\nWill you rent other movie? Y/N\n");
+		  		__fpurge(stdin);
+		  		scanf("%c", &newSearch);
+
+		  		if(newSearch != 'y' && newSearch != 'Y' && newSearch != 'n' && newSearch != 'N'){
+		  			system("clear");
+		  			invalidDigit();
+		  		}
+
+		  		if(newSearch == 'y' || newSearch == 'Y')
+		  		{
+		  			fclose(myFile);
+		  			myFile = fopen(fileName, "r+");
+		  			found = 0;
+		  			_haveToClean = 'y';
+		  		}
+
+	  		}while(newSearch != 'y' && newSearch != 'Y' && newSearch != 'n' && newSearch != 'N');
+	  	}
+  	}while(found==0 || checkDupeTitle(search, myFile) == 1);
+
+  	system("clear");
+	fclose(myFile);
 }
 
 void createUser()
@@ -710,7 +948,7 @@ void createUser()
 
 	struct user newUser;
 
-	printf("\nName: ");
+	printf("Name: ");
 	__fpurge(stdin);
 	fgets(newUser.name, sizeof(newUser.name), stdin);
 	strtok(newUser.name, "\n"); //remove \n that fgets insert	
@@ -736,12 +974,138 @@ void createUser()
 
 int loadUser(char *cpf)
 {
-	return 1;
+	FILE *userFile;
+	char userFileName[25] = "files/users.txt";
+
+	if((userFile = fopen(userFileName, "r")) == NULL)
+	{
+		return 1;
+	}
+
+	userFile = fopen(userFileName, "r+");
+
+	int found = 0;
+  	char line[200];
+
+  	do{
+  		memset(line, 0, sizeof(line));
+
+  		fseek(userFile, 0, SEEK_SET);
+
+	  	char name[50];
+	  	char phone[20];
+	  	char cpfUser[15];
+	  	
+	  	int phoneHelper;
+	  	int phoneIndex = 0;
+
+	  	int cpfUserHelper;
+	  	int cpfUserIndex = 0;
+
+	  	while(fgets(line, sizeof(line), userFile))
+	  	{
+	  		if(strstr(line, cpf) != NULL) //check if the word exists in the file
+		  	{  	
+		  		
+		  		for(int x=0; x<sizeof(name); x++) //clear title
+		  			name[x] = '\0';
+
+		  		for(int x = 0; x<strlen(line); x++) //get movie title
+		  		{
+		  			if(line[x] == '|')
+		  				continue;
+		  			
+		  			name[x] = line[x];
+		  		}
+
+		  		for(int y=0; y<sizeof(phone); y++) //clear code
+		  			phone[y] = '\0';
+
+		  		for(int y=0; y<strlen(line); y++) //get code
+		  		{
+		  			if(line[y] == '|')
+		  			{
+		  				phoneHelper = 1;
+		  			}
+
+		  			if(line[y] == ';')
+		  			{
+		  				phoneHelper = 0;
+		  				continue;
+		  			}
+
+		  			if(phoneHelper == 1)
+		  			{
+		  				phone[phoneIndex] = line[y+1];
+		  				
+		  				if(phone[phoneIndex] == ';')
+		  					phone[phoneIndex] = '\0';
+
+		  				phoneIndex++;
+		  			}
+		  		}
+
+		  		for(int z=0; z<sizeof(cpfUser); z++) //clear status
+		  			cpfUser[z] = '\0';
+
+		  		for(int z=0; z<strlen(line); z++) //get status
+		  		{
+		  			if(line[z] == ';')
+		  			{
+		  				cpfUserHelper = 1;
+		  			}
+
+		  			if(line[z] == '\n')
+		  			{
+		  				cpfUserHelper = 0;
+		  				continue;
+		  			}
+
+		  			if(cpfUserHelper == 1)
+		  			{
+		  				cpfUser[cpfUserIndex] = line[z+1];
+		  				
+		  				if(cpfUser[cpfUserIndex] == '\n')
+		  					cpfUser[cpfUserIndex] = '\0';
+
+		  				cpfUserIndex++;
+		  			}
+		  		}
+
+		  		phoneHelper = 0;
+		  		phoneIndex = 0;
+
+		  		cpfUserHelper = 0;
+		  		cpfUserIndex = 0;
+
+		  		found=1;
+		  	}
+	  	}
+
+	  	if(found==0) //if haven't found anything, show an error
+	  	{
+	  		return 1;
+	  	}
+
+	  	if(found == 1)
+	  	{
+	  		return 0;
+	  	}
+  	}while(found==0);
+
+  	getchar();
+  	system("clear");
+	fclose(userFile);
+	return 0;
 }
 
 void generatePDF()
 {
 	printf("====== GENERATE PDF ======\n\n");
+
+	__fpurge(stdin);
+	getchar();
+	system("clear");
 }
 
 void invalidDigit()

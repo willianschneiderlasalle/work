@@ -51,7 +51,11 @@ int menu()
 			break;
 		case '5':
 			system("clear");
+			printf("====== MOVIES REGISTERED ======\n");
 			checkInfo();
+			__fpurge(stdin);
+  			getchar();
+  			system("clear");
 			break;
 		case '6':
 			system("clear");
