@@ -65,6 +65,7 @@ int menu()
 		case '7':
 			system("clear");
 			returnMovie();
+			break;
 		case '8':
 			printf("Exiting...\n");
 			return 0;

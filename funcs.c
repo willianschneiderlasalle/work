@@ -13,7 +13,7 @@ void textGreen();
 void textRed();
 void textYellow();
 void resetText();
-void save();
+void save(char *change, char *title, char *code, char *status, char *line);
 int checkDupeTitle();
 
 int registerMovie()
@@ -148,16 +148,11 @@ void searchMovie()
   	int found = 0;
   	char search[100];
   	char line[200];
-  	char _haveToClean = '\0';
   	char newSearch;
 
   	do{
-  		if(_haveToClean = 'y')
-  		{
-  			getchar();
-  			system("clear");
-  			_haveToClean = 'n';
-  		}
+  		getchar();
+  		system("clear");
 
   		memset(search, 0, sizeof(search));
   		memset(line, 0, sizeof(line));
@@ -279,7 +274,6 @@ void searchMovie()
 	  		textRed();
 	  		printf("\n\nMovie not found! Try again or press CTRL + C to abort...\n");
 	  		resetText();
-	  		_haveToClean = 'y';
 	  	}
 
 	  	if(found == 1)
@@ -519,7 +513,7 @@ void editMovie()
 
 			  		if(willSave == 'y' || willSave == 'Y')
 			  		{
-			  			save(editWhat, title, code, status, count, line); //call function to save the changes
+			  			save(editWhat, title, code, status, line); //call function to save the changes
 			  		}
 			  		else if(willSave == 'n' || willSave == 'N')
 			  		{
@@ -899,7 +893,7 @@ void rent()
 			  			printf(" to %s", userName);
 			  			resetText();
 
-						save("status", title, code, status, count, line); //call function to save the changes
+						save("status", title, code, status, line); //call function to save the changes
 			  		}
 			  		else if(willSave == 'n' || willSave == 'N')
 			  		{
@@ -966,7 +960,7 @@ void rentedMovies()
 
 	FILE *userFile;
 
-	char fileName[25] = "files/rented.txt";
+	char fileName[17] = "files/rented.txt";
 
 	if((userFile = fopen(fileName, "r")) == NULL)
 	{
@@ -1140,8 +1134,7 @@ void returnMovie()
 	printf("====== RETURN MOVIES ======\n\n");
 
 	FILE *userFile;
-
-	char fileName[25] = "files/rented.txt";
+	char fileName[17] = "files/rented.txt";
 
 	if((userFile = fopen(fileName, "r")) == NULL)
 	{
@@ -1154,7 +1147,242 @@ void returnMovie()
 
 	userFile = fopen(fileName, "r+");
 
+  	int found = 0;
+  	char line[200];
+	char newSearch;
+  	char returnedMovie[50];
+	int del;
+	int rnm;
+	char registerLine[200];
 
+	FILE *tempUser;
+	char tempName[19] = "files/tempUser.txt";
+
+  	do
+  	{
+	  	system("clear");
+
+	  	printf("What movie would you like to return? ");
+	  	__fpurge(stdin);
+	  	fgets(returnedMovie, sizeof(returnedMovie), stdin);
+	  	strtok(returnedMovie, "\n");
+
+		memset(line, 0, sizeof(line));
+
+		fseek(userFile, 0, SEEK_SET);
+
+	  	textYellow();
+	  	printf("\nNAME\t\tTITLE \t\tCODE \t\tRENT DATE\n");
+	  	resetText();
+
+	  	char name[50];
+	  	char title[50];
+	  	char code[10];
+	  	char date[10];
+	  	
+	  	int titleHelper;
+	  	int titleIndex = 0;
+
+	  	int codeHelper;
+	  	int codeIndex = 0;
+
+	  	int dateHelper;
+	  	int dateIndex = 0;
+
+	  	while(fgets(line, sizeof(line), userFile))
+	  	{
+	  		for(int w=0; w<sizeof(name); w++)
+	  			name[w] = '\0';
+
+	  		for(int w=0; w<strlen(line); w++)
+	  		{
+	  			if(line[w] == '*')
+	  				continue;
+
+	  			name[w] = line[w];
+	  		}
+
+	  		for(int x=0; x<sizeof(title); x++) //clear code
+	  			title[x] = '\0';
+
+	  		for(int x=0; x<strlen(line); x++) //get code
+	  		{
+	  			if(line[x] == '*')
+	  			{
+	  				titleHelper = 1;
+	  			}
+
+	  			if(line[x] == ';')
+	  			{
+	  				titleHelper = 0;
+	  				continue;
+	  			}
+
+	  			if(titleHelper == 1)
+	  			{
+	  				title[titleIndex] = line[x+1];
+	  				
+	  				if(title[titleIndex] == ';')
+	  					title[titleIndex] = '\0';
+
+	  				titleIndex++;
+	  			}
+	  		}
+
+	  		for(int y=0; y<sizeof(code); y++) //clear code
+	  			code[y] = '\0';
+
+	  		for(int y=0; y<strlen(line); y++) //get code
+	  		{
+	  			if(line[y] == ';')
+	  			{
+	  				codeHelper = 1;
+	  			}
+
+	  			if(line[y] == '#')
+	  			{
+	  				codeHelper = 0;
+	  				continue;
+	  			}
+
+	  			if(codeHelper == 1)
+	  			{
+	  				code[codeIndex] = line[y+1];
+
+	  				if(code[codeIndex] == '#')
+	  					code[codeIndex] = '\0';
+	  				
+	  				if(code[codeIndex] == ';')
+	  					code[codeIndex] = '\0';
+
+	  				codeIndex++;
+	  			}
+	  		}
+
+	  		for(int z=0; z<sizeof(date); z++) //clear status
+	  			date[z] = '\0';
+
+	  		for(int z=0; z<strlen(line); z++) //get status
+	  		{
+	  			if(line[z] == '#')
+	  			{
+	  				dateHelper = 1;
+	  			}
+
+	  			if(line[z] == '\n')
+	  			{
+	  				dateHelper = 0;
+	  				continue;
+	  			}
+
+	  			if(dateHelper == 1)
+	  			{
+	  				date[dateIndex] = line[z+1];
+	  				
+	  				if(date[dateIndex] == '\n')
+	  					date[dateIndex] = '\0';
+
+	  				dateIndex++;
+	  			}
+	  		}
+
+	  		titleHelper = 0;
+	  		titleIndex = 0;
+
+	  		codeHelper = 0;
+	  		codeIndex = 0;
+
+	  		dateHelper = 0;
+	  		dateIndex = 0;
+
+	  		if((strcmp(returnedMovie, title) == 0 || strcmp(returnedMovie,code) == 0) && checkDupeTitle(returnedMovie, userFile) == 0)
+	  		{
+	  			printf("\n%.7s\t\t%.10s\t\t%s\t%s", name, title, code, date); //print line content
+	  			found = 1;			
+
+				fseek(userFile, 0, SEEK_SET);
+
+				int count = 0;
+				char fileLine[200];
+
+				while (fgets(fileLine, sizeof(fileLine), userFile))
+				{
+				    count = strlen(fileLine) + count;
+			    }
+
+				fseek(userFile, 0, SEEK_SET);
+
+				char fileContent[count];
+
+				strcpy(fileContent, "a");
+
+				memset(fileContent, 0, sizeof(fileContent));
+
+				while(fgets(fileLine, sizeof(fileLine), userFile)) //check every line of the file
+				{
+					if(strcmp(line, fileLine) ==  0)
+					{
+						strcat(fileContent, "");
+					}
+					else
+					{
+						strcat(fileContent, fileLine); //when finish the loop, fileContent will have the new whole file content
+					} 
+				}
+
+				fclose(userFile);
+
+				tempUser = fopen(tempName, "a");
+				fprintf(tempUser, "%s", fileContent);
+				fclose(tempUser);
+
+				del = remove("files/rented.txt");
+				rnm = rename("files/tempUser.txt", "files/rented.txt");
+
+				if(del == 0 && rnm == 0)
+				{
+					strcpy(registerLine, title);
+					strcat(registerLine, "|");
+					strcat(registerLine, code);
+					strcat(registerLine, ";");
+					strcat(registerLine, "true");
+					strcat(registerLine, "\n");
+
+					save("status", title, code, "false", registerLine);
+
+					textGreen();
+					printf("\nMovie returned!");
+					resetText();		
+				}
+				else
+				{
+					textRed();
+					printf("Something went wrong... Aborting...");
+					resetText();
+					return;
+				}
+
+				memset(fileLine, 0, sizeof(fileLine));
+				memset(fileContent, 0, sizeof(fileContent));
+  				memset(line, 0, sizeof(line));
+
+	  		}
+	  	}
+
+	  	if(found==0 && checkDupeTitle(returnedMovie, userFile) == 0) //if haven't found anything, show an error
+	  	{
+	  		textRed();
+	  		printf("\n\nMovie not found! Try again or press CTRL + C to abort...\n");
+	  		resetText();
+	  		__fpurge(stdin);
+	  		getchar();
+	  	}
+
+  	}while(found==0 || checkDupeTitle(returnedMovie, userFile) == 1);
+
+  	__fpurge(stdin);
+  	getchar();
+	system("clear");
 }
 
 void invalidDigit()
@@ -1164,7 +1392,7 @@ void invalidDigit()
 	resetText();
 }
 
-void save(char *change, char *title, char *code, char *status, char *index, char *line)
+void save(char *change, char *title, char *code, char *status, char *line)
 {
 	char newLine[200] = "";
 	
@@ -1174,6 +1402,7 @@ void save(char *change, char *title, char *code, char *status, char *index, char
 	strcat(newLine, ";");
 	strcat(newLine, status);
 	strcat(newLine, "\n");
+
 		
 	FILE *myFile;
 	FILE *tempFile;
@@ -1196,8 +1425,6 @@ void save(char *change, char *title, char *code, char *status, char *index, char
 
 	int count = 0;
 	char fileLine[200];
-
-	//int newLineCount = strlen(newLine)+1;
 
 	while (fgets(fileLine, sizeof(fileLine), myFile))
 	{
