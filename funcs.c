@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h> //used by rand()
-#include <sys/time.h> //gettimeoftheday
+#include <sys/time.h> //gettimeofday
 #include <stdio_ext.h> //allow __fpurge - clears buffer
 
 #define LOW 268435456
@@ -15,8 +15,6 @@ void textYellow();
 void resetText();
 void save();
 int checkDupeTitle();
-void createUser();
-int loadUser();
 
 int registerMovie()
 {
@@ -169,7 +167,9 @@ void searchMovie()
 	  	printf("Search for a movie by title or code: ");
 	  	__fpurge(stdin);
 	  	fgets(search, sizeof(search), stdin); //get word to search
+	  	textYellow();
 	  	printf("\n     TITLE\t\tCODE\t\tRENTED?");
+	  	resetText();
 	  	strtok(search, "\n"); //remove \n that fgets insert
 
 	  	int count = 1;
@@ -348,7 +348,9 @@ void editMovie()
 	  	printf("Type the title of the movie you would like to edit: ");
 	  	__fpurge(stdin);
 	  	fgets(search, sizeof(search), stdin); //get word to search
-	  	printf("\n     TITLE\t\tCODE\t\tRENTED?");
+	  	textYellow();
+	  	printf("\n   TITLE\t\tCODE\t\tRENTED?\n");
+	  	resetText();
 	  	strtok(search, "\n"); //remove \n that fgets insert
 
 	  	int count = 1;
@@ -475,19 +477,29 @@ void editMovie()
 				  	}
 				    else if(strcmp(editWhat, "Status") == 0 || strcmp(editWhat, "status") == 0) //edit status
 				  	{
+				  		textYellow();
+				  		printf("\nChanging status to false needs to remove manually the user log on user.txt\n");
+				  		resetText();
+
 				  		textRed();
 				  		printf("\nCurrent status = %s", status);
-				  		textGreen();
+				  		resetText();
 
 				  		if(strcmp(status,"true") == 0)
 				  		{
 				  			strcpy(status, "false");
+
+				  			textGreen();
 				  			printf("\nNew status = %s", status);
+				  			resetText();
 				  		}
 				  		else if(strcmp(status, "false") == 0)
 				  		{
 				  			strcpy(status, "true");
+
+				  			textGreen();
 				  			printf("\nNew status = %s", status);
+				  			resetText();
 				  		}
 				  		resetText();
 				  		printf("\nStatus can only be true or false!");
@@ -579,7 +591,7 @@ void checkInfo()
 	{
 		system("clear");
 		textRed();
-		printf("You need to have at least one movie registered. \n");
+		printf("You need to have at least one movie registered.\n");
 		resetText();
 		return;
 	}
@@ -593,7 +605,9 @@ void checkInfo()
 
 	fseek(myFile, 0, SEEK_SET);
 
-  	printf("\n     TITLE\t\tCODE\t\tRENTED?");
+  	textYellow();
+  	printf("\n     TITLE\t\tCODE\t\tRENTED?\n");
+  	resetText();
 
   	int count = 1;
 
@@ -702,6 +716,10 @@ void rent()
 
 	if((myFile = fopen(fileName, "r")) == NULL)
 	{
+		system("clear");
+		textRed();
+		printf("You need to have at least one movie registered. Backing to menu...\n");
+		resetText();
 		return;
 	}
 
@@ -735,7 +753,6 @@ void rent()
 	  	printf("\nEnter the movie you would like to rent: ");
 	  	__fpurge(stdin);
 	  	fgets(search, sizeof(search), stdin); //get word to search
-	  	//printf("\n     TITLE\t\tCODE\t\tRENTED?");
 	  	strtok(search, "\n"); //remove \n that fgets insert
 
 	  	int count = 1;
@@ -823,7 +840,6 @@ void rent()
 
 		  		if((strcmp(search, title) == 0 || strcmp(search,code) == 0) && checkDupeTitle(search, myFile) == 0) //check if there is a title/code with the word searched
 	  		{
-				//printf("\n%d. %.12s\t\t%s\t%s\n", count, title, code, status); 
 
 				found = 1;
 
@@ -850,32 +866,40 @@ void rent()
 			  		scanf("%s", &willSave); //get word to search
 
 			  		if(willSave == 'y' || willSave == 'Y')
-			  		{
+			  		{	
+			  			char userCheck[500];
+
+			  			FILE *users;
+			  			users = fopen("files/rented.txt", "a");
+
+			  			printf("\nUser name: ");
+			  			char userName[50];
+			  			__fpurge(stdin);
+			  			fgets(userName, sizeof(userName), stdin);
+			  			strtok(userName, "\n");
+
 			  			system("clear");
-			  			printf("Enter client CPF: ");
-	  					__fpurge(stdin);
-	  					fgets(cpf, sizeof(cpf), stdin);
-	  					strtok(cpf, "\n"); 
 
-	  					if(loadUser(cpf) == 0)
-	  					{
-	  						textGreen();
-	  						printf("\nUser found!");
-	  						resetText();
-	  					}
-	  					else
-	  					{
-	  						textRed();
-	  						printf("\nUser not found!");
-	  						resetText();
-	  						printf("\nLet's register a new one...\n\n");
-	  						createUser();
-	  					}
+			  			char buffer[30];
+						struct timeval tv;
 
-	  					//ADD TO CLIENT FILE THE MOVIE RENTED BY EACH USER
-	  					//CREATE "DELIVERY" FUNCTION
+						time_t curtime;
 
-			  			save("status", title, code, status, count, line); //call function to save the changes
+						gettimeofday(&tv, NULL); 
+						curtime=tv.tv_sec;
+
+						strftime(buffer,30,"%m/%d/%Y-%T",localtime(&curtime));
+
+			  			fprintf(users, "%s*%s;%s#%s\n",userName, title, code, buffer);			  			
+
+			  			fclose(users);
+
+			  			textYellow();
+			  			printf("Movie '%s' rented on %s", title, buffer);
+			  			printf(" to %s", userName);
+			  			resetText();
+
+						save("status", title, code, status, count, line); //call function to save the changes
 			  		}
 			  		else if(willSave == 'n' || willSave == 'N')
 			  		{
@@ -912,7 +936,7 @@ void rent()
 	  	{
 	  		do
 	  		{
-		  		printf("\n\nWill you rent other movie? Y/N\n");
+		  		printf("\n\nWill you rent another movie? Y/N\n");
 		  		__fpurge(stdin);
 		  		scanf("%c", &newSearch);
 
@@ -934,178 +958,203 @@ void rent()
   	}while(found==0 || checkDupeTitle(search, myFile) == 1);
 
   	system("clear");
-	fclose(myFile);
 }
 
-void createUser()
+void rentedMovies()
 {
-	struct user
-	{
-		char name[50];
-		char phone[20];
-		char cpf[15];
-	};
-
-	struct user newUser;
-
-	printf("Name: ");
-	__fpurge(stdin);
-	fgets(newUser.name, sizeof(newUser.name), stdin);
-	strtok(newUser.name, "\n"); //remove \n that fgets insert	
-
-	printf("\nPhone: ");
-	__fpurge(stdin);
-	fgets(newUser.phone, sizeof(newUser.phone), stdin);
-	strtok(newUser.phone, "\n"); //remove \n that fgets insert	
-
-	printf("\nCPF: ");
-	__fpurge(stdin);
-	fgets(newUser.cpf, sizeof(newUser.cpf), stdin);
-	strtok(newUser.cpf, "\n"); //remove \n that fgets insert	
+	printf("====== RENTED MOVIES ======\n\n");
 
 	FILE *userFile;
-	char userFileName[25] = "files/users.txt";
 
-	userFile = fopen(userFileName, "a");
+	char fileName[25] = "files/rented.txt";
 
-	fprintf(userFile, "%s|%s;%s\n", newUser.name, newUser.phone, newUser.cpf);
-	fclose(userFile);
-}
-
-int loadUser(char *cpf)
-{
-	FILE *userFile;
-	char userFileName[25] = "files/users.txt";
-
-	if((userFile = fopen(userFileName, "r")) == NULL)
+	if((userFile = fopen(fileName, "r")) == NULL)
 	{
-		return 1;
+		system("clear");
+		textRed();
+		printf("You have no movies rented. \n");
+		resetText();
+		return;
 	}
 
-	userFile = fopen(userFileName, "r+");
+	userFile = fopen(fileName, "r+");
 
-	int found = 0;
+  	int found = 0;
   	char line[200];
 
-  	do{
-  		memset(line, 0, sizeof(line));
+	memset(line, 0, sizeof(line));
 
-  		fseek(userFile, 0, SEEK_SET);
+	fseek(userFile, 0, SEEK_SET);
 
-	  	char name[50];
-	  	char phone[20];
-	  	char cpfUser[15];
-	  	
-	  	int phoneHelper;
-	  	int phoneIndex = 0;
+  	textYellow();
+  	printf("NAME\t\t\tTITLE \t\tCODE \t\tRENT DATE\n");
+  	resetText();
 
-	  	int cpfUserHelper;
-	  	int cpfUserIndex = 0;
+  	int count = 1;
 
-	  	while(fgets(line, sizeof(line), userFile))
-	  	{
-	  		if(strstr(line, cpf) != NULL) //check if the word exists in the file
-		  	{  	
-		  		
-		  		for(int x=0; x<sizeof(name); x++) //clear title
-		  			name[x] = '\0';
+  	char name[50];
+  	char title[200];
+  	char code[10];
+  	char date[10];
+  	
+  	int titleHelper;
+  	int titleIndex = 0;
 
-		  		for(int x = 0; x<strlen(line); x++) //get movie title
-		  		{
-		  			if(line[x] == '|')
-		  				continue;
-		  			
-		  			name[x] = line[x];
-		  		}
+  	int codeHelper;
+  	int codeIndex = 0;
 
-		  		for(int y=0; y<sizeof(phone); y++) //clear code
-		  			phone[y] = '\0';
+  	int dateHelper;
+  	int dateIndex = 0;
 
-		  		for(int y=0; y<strlen(line); y++) //get code
-		  		{
-		  			if(line[y] == '|')
-		  			{
-		  				phoneHelper = 1;
-		  			}
+  	while(fgets(line, sizeof(line), userFile))
+  	{	  		
+  		for(int w=0; w<sizeof(name); w++)
+  			name[w] = '\0';
 
-		  			if(line[y] == ';')
-		  			{
-		  				phoneHelper = 0;
-		  				continue;
-		  			}
+  		for(int w=0; w<strlen(line); w++)
+  		{
+  			if(line[w] == '*')
+  				continue;
 
-		  			if(phoneHelper == 1)
-		  			{
-		  				phone[phoneIndex] = line[y+1];
-		  				
-		  				if(phone[phoneIndex] == ';')
-		  					phone[phoneIndex] = '\0';
+  			name[w] = line[w];
+  		}
 
-		  				phoneIndex++;
-		  			}
-		  		}
+  		for(int x=0; x<sizeof(title); x++) //clear code
+  			title[x] = '\0';
 
-		  		for(int z=0; z<sizeof(cpfUser); z++) //clear status
-		  			cpfUser[z] = '\0';
+  		for(int x=0; x<strlen(line); x++) //get code
+  		{
+  			if(line[x] == '*')
+  			{
+  				titleHelper = 1;
+  			}
 
-		  		for(int z=0; z<strlen(line); z++) //get status
-		  		{
-		  			if(line[z] == ';')
-		  			{
-		  				cpfUserHelper = 1;
-		  			}
+  			if(line[x] == ';')
+  			{
+  				titleHelper = 0;
+  				continue;
+  			}
 
-		  			if(line[z] == '\n')
-		  			{
-		  				cpfUserHelper = 0;
-		  				continue;
-		  			}
+  			if(titleHelper == 1)
+  			{
+  				title[titleIndex] = line[x+1];
+  				
+  				if(title[titleIndex] == ';')
+  					title[titleIndex] = '\0';
 
-		  			if(cpfUserHelper == 1)
-		  			{
-		  				cpfUser[cpfUserIndex] = line[z+1];
-		  				
-		  				if(cpfUser[cpfUserIndex] == '\n')
-		  					cpfUser[cpfUserIndex] = '\0';
+  				titleIndex++;
+  			}
+  		}
 
-		  				cpfUserIndex++;
-		  			}
-		  		}
+  		for(int y=0; y<sizeof(code); y++) //clear code
+  			code[y] = '\0';
 
-		  		phoneHelper = 0;
-		  		phoneIndex = 0;
+  		for(int y=0; y<strlen(line); y++) //get code
+  		{
+  			if(line[y] == ';')
+  			{
+  				codeHelper = 1;
+  			}
 
-		  		cpfUserHelper = 0;
-		  		cpfUserIndex = 0;
+  			if(line[y] == '#')
+  			{
+  				codeHelper = 0;
+  				continue;
+  			}
 
-		  		found=1;
-		  	}
-	  	}
+  			if(codeHelper == 1)
+  			{
+  				code[codeIndex] = line[y+1];
 
-	  	if(found==0) //if haven't found anything, show an error
-	  	{
-	  		return 1;
-	  	}
+  				if(code[codeIndex] == '#')
+  					code[codeIndex] = '\0';
+  				
+  				if(code[codeIndex] == ';')
+  					code[codeIndex] = '\0';
 
-	  	if(found == 1)
-	  	{
-	  		return 0;
-	  	}
-  	}while(found==0);
+  				codeIndex++;
+  			}
+  		}
 
-  	getchar();
-  	system("clear");
+  		for(int z=0; z<sizeof(date); z++) //clear status
+  			date[z] = '\0';
+
+  		for(int z=0; z<strlen(line); z++) //get status
+  		{
+  			if(line[z] == '#')
+  			{
+  				dateHelper = 1;
+  			}
+
+  			if(line[z] == '\n')
+  			{
+  				dateHelper = 0;
+  				continue;
+  			}
+
+  			if(dateHelper == 1)
+  			{
+  				date[dateIndex] = line[z+1];
+  				
+  				if(date[dateIndex] == '\n')
+  					date[dateIndex] = '\0';
+
+  				dateIndex++;
+  			}
+  		}
+
+  		for(int i=0; i<15; i++)
+  		{
+  			if(strlen(name) < 15)
+  				strcat(name, " ");
+
+  			if(strlen(title) < 10)
+  				strcat(title, " ");
+  		}
+
+	  	printf("\n%.15s\t\t%.10s\t%s\t%s", name, title, code, date); //print line content
+  		
+  		count++;
+
+  		titleHelper;
+  		titleIndex = 0;
+
+  		codeHelper = 0;
+  		codeIndex = 0;
+
+  		dateHelper = 0;
+  		dateIndex = 0;
+	}
+
+	printf("\n");
 	fclose(userFile);
-	return 0;
-}
 
-void generatePDF()
-{
-	printf("====== GENERATE PDF ======\n\n");
 
 	__fpurge(stdin);
 	getchar();
 	system("clear");
+}
+
+void returnMovie()
+{
+	printf("====== RETURN MOVIES ======\n\n");
+
+	FILE *userFile;
+
+	char fileName[25] = "files/rented.txt";
+
+	if((userFile = fopen(fileName, "r")) == NULL)
+	{
+		system("clear");
+		textRed();
+		printf("You have no movies rented. \n");
+		resetText();
+		return;
+	}
+
+	userFile = fopen(fileName, "r+");
+
+
 }
 
 void invalidDigit()
@@ -1148,7 +1197,7 @@ void save(char *change, char *title, char *code, char *status, char *index, char
 	int count = 0;
 	char fileLine[200];
 
-	int newLineCount = strlen(newLine)+1;
+	//int newLineCount = strlen(newLine)+1;
 
 	while (fgets(fileLine, sizeof(fileLine), myFile))
 	{

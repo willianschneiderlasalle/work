@@ -8,7 +8,7 @@ void searchMovie();
 
 void checkInfo();
 
-void generatePDF();
+void rentedMovies();
 
 void invalidDigit(); //error message
 
