@@ -21,12 +21,13 @@ int menu()
 	printf("====== VIDEO RENTAL SOFTWARE ======\n\n");
 	
 	printf("1 - Register new movie\n");
-	printf("2 - Rent to user\n");
+	printf("2 - Rent movie\n");
 	printf("3 - Edit an existent movie\n");
 	printf("4 - Search movie by title or ID\n");
-	printf("5 - Check movies info\n");
-	printf("6 - Generate PDF report \n");
-	printf("7 - Exit\n\n");
+	printf("5 - Check all movies info\n");
+	printf("6 - Movies rented list \n");
+	printf("7 - Return movie \n");
+	printf("8 - Exit\n\n");
 
 	__fpurge(stdin);
 	scanf("%c", &menuChoice);
@@ -51,13 +52,21 @@ int menu()
 			break;
 		case '5':
 			system("clear");
+			printf("====== MOVIES REGISTERED ======\n");
 			checkInfo();
+			__fpurge(stdin);
+  			getchar();
+  			system("clear");
 			break;
 		case '6':
 			system("clear");
-			generatePDF();
+			rentedMovies();
 			break;
 		case '7':
+			system("clear");
+			returnMovie();
+			break;
+		case '8':
 			printf("Exiting...\n");
 			return 0;
 			break;
